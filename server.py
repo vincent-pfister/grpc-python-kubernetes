@@ -1,15 +1,19 @@
-from concurrent import futures
 import time
+import uuid
+from concurrent import futures
+
 import grpc
+
 import getid_pb2
 import getid_pb2_grpc
-import uuid
 
-id = uuid.uuid4()
+id_ = uuid.uuid4()
+
 
 class Information(getid_pb2_grpc.InformationServicer):
     def RequestID(self, request, context):
-        return getid_pb2.IDReply(message='ID: %s' % id)
+        return getid_pb2.IDReply(message='ID: %s' % id_)
+
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
