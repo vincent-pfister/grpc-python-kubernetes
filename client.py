@@ -13,6 +13,8 @@ import getid_pb2_grpc
 def parse_options(argv):
     parser = OptionParser("usage: %prog [options] <server>")
     parser.add_option("-c", "--cert", help="server certificate", dest="cert")
+    parser.add_option("-s", "--secure", action="store_true", help="use a secure channel, ignored if --cert is given",
+                      dest="secure")
     parser.add_option("-n", default=10, type="int", help="number of request, 0 for infinite", dest="num")
     options, args = parser.parse_args(args=argv[1:])
     if len(args) != 1:
@@ -30,6 +32,9 @@ signal.signal(signal.SIGINT, sigint_handler)
 def run(server, options):
     if options.cert is not None:
         creds = grpc.ssl_channel_credentials(open(options.cert, 'rb').read())
+        channel = grpc.secure_channel(server, creds)
+    elif options.secure:
+        creds = grpc.ssl_channel_credentials()
         channel = grpc.secure_channel(server, creds)
     else:
         channel = grpc.insecure_channel(server)

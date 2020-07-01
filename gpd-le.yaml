@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: gpd
+  name: gpd
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gpd
+  template:
+    metadata:
+      labels:
+        app: gpd
+    spec:
+      containers:
+        - image: vprp/grpc-python-kubernetes
+          imagePullPolicy: Always
+          name: gpd
+          ports:
+            - containerPort: 50051
+              name: grpc
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpd
+  labels:
+    app: gpd
+spec:
+  ports:
+    - port: 50051
+      targetPort: 50051
+      name: grpc
+  selector:
+    app: gpd
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: gpd
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: "Host(`gpd.vega.local.raisepartner.com`)"
+      kind: Rule
+      services:
+        - name: gpd
+          port: 50051
+          scheme: h2c
+  tls:
+    #    secretName: gpd-secret
+    certResolver: gcloud-resolver
+    domains:
+      - main: gpd.vega.local.raisepartner.com

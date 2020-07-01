@@ -59,6 +59,8 @@ grpc._channel._InactiveRpcError: <_InactiveRpcError of RPC that terminated with:
 
 ### Run with TLS in k3d + traefik
 
+#### self-signed certificate 
+
 Create the TLS secret with the self-signed certificate
 ```shell script
 kubectl create secret tls --key tls.key --cert tls.crt gpd-secret
@@ -74,4 +76,15 @@ kubectl apply -f gpd-self.yaml
 Run the client with TLS:
 ```shell script
 python client.py gpd.vega.local.raisepartner.com --cert tls.pem
+```
+
+#### LE certificate
+
+```
+kubectl apply -f gpd-le.yaml
+```
+
+Run the client with TLS:
+```shell script
+python client.py gpd.vega.local.raisepartner.com -s
 ```
